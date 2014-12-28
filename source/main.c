@@ -533,36 +533,33 @@ s32 main(s32 argc, const char* argv[])
 	
 	else
 	{
-		if(1 == 1)
+		sysSleep(5);
+		sysFSStat s;
+		if(filestat(CONF_PATH, &s)>=0) 
 		{
-			sysSleep(5);
-			sysFSStat s;
-			if(filestat(CONF_PATH, &s)>=0) 
-			{
-				u64 * payload;
-				u32 size;
-				char payload_path[256];
-				int lv2_version = get_lv2_version();
+			u64 * payload;
+			u32 size;
+			char payload_path[256];
+			int lv2_version = get_lv2_version();
 
-				if(!lv2_version)
-				{
-					ring_buzzer();
-					printf("no suitable payload available\n");
-					return -1;
-				}
-				write_htab();
-				sprintf(payload_path, PAYLOAD_PATH, lv2_version);
-				payload = (u64 *) read_file(payload_path, &size, 8);
-				install_syscall(PRX_SYSCALL, payload, size, PRX_SYSCALL_OFFSET);
-				free(payload);
-				//patch permission 4.xx
-				lv2poke(0x8000000000003D90ULL, 0x386000014E800020ULL); // usually "fixed" by warez payload
-				printf("permission patch applied\n");
-				load_all_prx(CONF_PATH);
+			if(!lv2_version)
+			{
+				ring_buzzer();
+				printf("no suitable payload available\n");
+				return -1;
 			}
-			
-			else { printf("vsh module list not found!"); }
-		}	
+			write_htab();
+			sprintf(payload_path, PAYLOAD_PATH, lv2_version);
+			payload = (u64 *) read_file(payload_path, &size, 8);
+			install_syscall(PRX_SYSCALL, payload, size, PRX_SYSCALL_OFFSET);
+			free(payload);
+			//patch permission 4.xx
+			lv2poke(0x8000000000003D90ULL, 0x386000014E800020ULL); // usually "fixed" by warez payload
+			printf("permission patch applied\n");
+			load_all_prx(CONF_PATH);
+		}
+		
+		else { printf("vsh module list not found!"); }
 	}
 	
 	sysSleep(1);
